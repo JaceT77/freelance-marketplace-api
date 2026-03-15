@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.enums import ContractStatus
 from app.models.review import Review
@@ -8,14 +8,14 @@ from app.schemas.review import ReviewCreate
 from app.services.contract_service import get_contract_by_id
 
 
-def create_review(
-    db: Session,
+async def create_review(
+    db: AsyncSession,
     *,
     contract_id: int,
     client: User,
     payload: ReviewCreate,
 ) -> Review:
-    contract = get_contract_by_id(db, contract_id)
+    contract = await get_contract_by_id(db, contract_id)
     if contract.client_id != client.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -38,6 +38,6 @@ def create_review(
         comment=payload.comment,
     )
     db.add(review)
-    db.commit()
-    db.refresh(review)
+    await db.commit()
+    await db.refresh(review)
     return review

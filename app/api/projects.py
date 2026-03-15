@@ -19,7 +19,7 @@ async def create_project_endpoint(
     db: SessionDep,
     current_client: CurrentClient,
 ):
-    return create_project(db, current_client, payload)
+    return await create_project(db, current_client, payload)
 
 
 @router.get("", response_model=ProjectListResponse)
@@ -32,7 +32,7 @@ async def list_projects_endpoint(
     min_budget: float | None = Query(default=None, ge=0),
     max_budget: float | None = Query(default=None, ge=0),
 ):
-    paginated_projects = list_open_projects(
+    paginated_projects = await list_open_projects(
         db,
         page=page,
         page_size=page_size,
@@ -54,6 +54,6 @@ async def get_project_endpoint(
     db: SessionDep,
     current_user: CurrentUser,
 ):
-    project = get_project_by_id(db, project_id)
+    project = await get_project_by_id(db, project_id)
     ensure_project_visibility(project, current_user)
     return project

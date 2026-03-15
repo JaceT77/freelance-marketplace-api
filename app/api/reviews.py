@@ -19,7 +19,7 @@ async def create_review_endpoint(
     db: SessionDep,
     current_client: CurrentClient,
 ):
-    return create_review(
+    return await create_review(
         db,
         contract_id=contract_id,
         client=current_client,

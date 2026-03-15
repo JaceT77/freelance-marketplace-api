@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.enums import ProjectStatus
 from app.models.project import Project
@@ -11,7 +12,9 @@ from app.utils.pagination import Page, paginate_statement
 from app.utils.search import apply_case_insensitive_search
 
 
-def create_project(db: Session, client: User, payload: ProjectCreate) -> Project:
+async def create_project(
+    db: AsyncSession, client: User, payload: ProjectCreate
+) -> Project:
     project = Project(
         title=payload.title,
         description=payload.description,
@@ -21,13 +24,13 @@ def create_project(db: Session, client: User, payload: ProjectCreate) -> Project
         client_id=client.id,
     )
     db.add(project)
-    db.commit()
-    db.refresh(project)
-    return get_project_by_id(db, project.id)
+    await db.commit()
+    await db.refresh(project)
+    return await get_project_by_id(db, project.id)
 
 
-def list_open_projects(
-    db: Session,
+async def list_open_projects(
+    db: AsyncSession,
     *,
     page: int,
     page_size: int,
@@ -43,16 +46,16 @@ def list_open_projects(
     )
     statement = apply_case_insensitive_search(statement, Project.title, search)
     statement = apply_budget_filters(statement, Project.budget, min_budget, max_budget)
-    return paginate_statement(db, statement, page=page, page_size=page_size)
+    return await paginate_statement(db, statement, page=page, page_size=page_size)
 
 
-def get_project_by_id(db: Session, project_id: int) -> Project:
+async def get_project_by_id(db: AsyncSession, project_id: int) -> Project:
     statement = (
         select(Project)
         .options(selectinload(Project.client), selectinload(Project.contract))
         .where(Project.id == project_id)
     )
-    project = db.scalar(statement)
+    project = await db.scalar(statement)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

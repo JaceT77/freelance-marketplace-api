@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import Select
 
 
@@ -13,17 +13,17 @@ class Page:
     page_size: int
 
 
-def paginate_statement(
-    db: Session,
+async def paginate_statement(
+    db: AsyncSession,
     statement: Select,
     *,
     page: int,
     page_size: int,
 ) -> Page:
-    total = db.scalar(
+    total = await db.scalar(
         select(func.count()).select_from(statement.order_by(None).subquery())
     ) or 0
-    items = db.scalars(
-        statement.offset((page - 1) * page_size).limit(page_size)
+    items = (
+        await db.scalars(statement.offset((page - 1) * page_size).limit(page_size))
     ).all()
     return Page(items=items, total=total, page=page, page_size=page_size)

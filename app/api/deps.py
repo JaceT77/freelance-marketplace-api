@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.permissions import require_role
 from app.core.security import decode_access_token
@@ -14,7 +14,7 @@ from app.services.auth_service import get_user_by_id
 
 
 bearer_scheme = HTTPBearer(auto_error=False)
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_db)]
 
 
 async def get_current_user(
@@ -36,7 +36,7 @@ async def get_current_user(
             detail="Invalid or expired token.",
         ) from None
 
-    user = get_user_by_id(db, user_id)
+    user = await get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -20,7 +20,7 @@ async def create_bid_endpoint(
     db: SessionDep,
     current_freelancer: CurrentFreelancer,
 ):
-    return create_bid(
+    return await create_bid(
         db,
         project_id=project_id,
         freelancer=current_freelancer,
@@ -34,7 +34,7 @@ async def list_project_bids_endpoint(
     db: SessionDep,
     current_client: CurrentClient,
 ):
-    return list_project_bids(db, project_id=project_id, client=current_client)
+    return await list_project_bids(db, project_id=project_id, client=current_client)
 
 
 @router.post("/bids/{bid_id}/accept", response_model=ContractRead)
@@ -43,4 +43,4 @@ async def accept_bid_endpoint(
     db: SessionDep,
     current_client: CurrentClient,
 ):
-    return accept_bid(db, bid_id=bid_id, client=current_client)
+    return await accept_bid(db, bid_id=bid_id, client=current_client)

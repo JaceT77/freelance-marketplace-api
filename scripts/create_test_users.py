@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 import sys
 
@@ -31,23 +32,20 @@ TEST_USERS = [
 ]
 
 
-def main() -> None:
-    init_db()
-    db = SessionLocal()
-    try:
+async def main() -> None:
+    await init_db()
+    async with SessionLocal() as db:
         for payload in TEST_USERS:
-            existing_user = db.scalar(
+            existing_user = await db.scalar(
                 select(User).where(User.username == payload["username"])
             )
             if existing_user:
                 print(f"Skipped existing user: {existing_user.username}")
                 continue
 
-            user = register_user(db, RegisterRequest(**payload))
+            user = await register_user(db, RegisterRequest(**payload))
             print(f"Created user: {user.username} ({user.role.value})")
-    finally:
-        db.close()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
