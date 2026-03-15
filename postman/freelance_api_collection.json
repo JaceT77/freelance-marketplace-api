@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "Freelance Marketplace API",
+    "_postman_id": "8f4d0ab2-0fdb-4c28-b1ba-cb6df56f6a65",
+    "description": "Postman collection for the Freelance Marketplace FastAPI project.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"client1\",\n  \"email\": \"client1@example.com\",\n  \"password\": \"client123\",\n  \"role\": \"client\",\n  \"bio\": \"Client account\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"client1\",\n  \"password\": \"client123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Project API",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Build marketplace backend\",\n  \"description\": \"Need a full backend with auth, projects, bids and contracts.\",\n  \"budget\": 2500,\n  \"deadline\": \"2030-01-15\"\n}"
+            },
+            "url": "{{baseUrl}}/api/projects"
+          }
+        },
+        {
+          "name": "List Open Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/projects?search=marketplace&min_budget=500&max_budget=3000&page=1&page_size=10"
+          }
+        },
+        {
+          "name": "Project Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/projects/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bid API",
+      "item": [
+        {
+          "name": "Create Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 2300,\n  \"message\": \"I can deliver the backend in 10 days.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/projects/1/bids"
+          }
+        },
+        {
+          "name": "List Project Bids",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/projects/1/bids"
+          }
+        },
+        {
+          "name": "Accept Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/bids/1/accept"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contract API",
+      "item": [
+        {
+          "name": "List Contracts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contracts"
+          }
+        },
+        {
+          "name": "Contract Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contracts/1"
+          }
+        },
+        {
+          "name": "Finish Contract",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contracts/1/finish"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review API",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Great communication and delivery.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/contracts/1/reviews"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
