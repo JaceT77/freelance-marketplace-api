@@ -1,14 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer
+from sqlalchemy import DateTime, Float, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import ContractStatus
-
-
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+from app.models.enums import ContractStatus, values_enum
+from app.models.timestamps import utcnow
 
 
 class Contract(Base):
@@ -23,7 +20,7 @@ class Contract(Base):
     freelancer_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     agreed_price: Mapped[float] = mapped_column(Float)
     status: Mapped[ContractStatus] = mapped_column(
-        Enum(ContractStatus, name="contract_status"),
+        values_enum(ContractStatus, name="contract_status"),
         default=ContractStatus.ACTIVE,
         nullable=False,
     )

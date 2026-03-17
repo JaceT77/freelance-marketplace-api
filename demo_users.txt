@@ -1,0 +1,16 @@
+Demo users from freelance_marketplace.db
+Shared password: seedpass123
+
+CLIENT
+seed_client_1_atlas_agency | seed_client_1@example.com | client
+seed_client_2_northstar_labs | seed_client_2@example.com | client
+seed_client_3_brightpath_studio | seed_client_3@example.com | client
+seed_client_4_summit_commerce | seed_client_4@example.com | client
+seed_client_5_harbor_ops | seed_client_5@example.com | client
+
+FREELANCER
+seed_freelancer_1_api_architect | seed_freelancer_1@example.com | freelancer
+seed_freelancer_2_react_builder | seed_freelancer_2@example.com | freelancer
+seed_freelancer_3_data_flow_dev | seed_freelancer_3@example.com | freelancer
+seed_freelancer_4_qa_guardian | seed_freelancer_4@example.com | freelancer
+seed_freelancer_5_cloud_crafter | seed_freelancer_5@example.com | freelancer

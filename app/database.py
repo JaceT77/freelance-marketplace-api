@@ -1,7 +1,15 @@
 from collections.abc import AsyncGenerator
+from pathlib import Path
 from typing import Any
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy import event
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import get_settings
@@ -11,7 +19,31 @@ class Base(DeclarativeBase):
     pass
 
 
+def _is_sqlite_url(database_url: str) -> bool:
+    return make_url(database_url).drivername.startswith("sqlite")
+
+
 def create_engine_from_url(database_url: str, **kwargs: Any) -> AsyncEngine:
+    if _is_sqlite_url(database_url):
+        database_path = make_url(database_url).database
+        if database_path and database_path != ":memory:":
+            Path(database_path).expanduser().parent.mkdir(parents=True, exist_ok=True)
+        connect_args = {"check_same_thread": False, **kwargs.pop("connect_args", {})}
+        engine = create_async_engine(
+            database_url,
+            pool_pre_ping=True,
+            connect_args=connect_args,
+            **kwargs,
+        )
+
+        @event.listens_for(engine.sync_engine, "connect")
+        def _set_sqlite_pragma(dbapi_connection, _) -> None:
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+
+        return engine
+
     return create_async_engine(database_url, pool_pre_ping=True, **kwargs)
 
 

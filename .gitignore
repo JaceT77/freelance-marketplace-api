@@ -43,6 +43,10 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+freelance_marketplace.db
+freelance_marketplace.db-journal
+freelance_marketplace_test.db
+freelance_marketplace_test.db-journal
 instance/
 .webassets-cache
 .scrapy

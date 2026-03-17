@@ -1,10 +1,3 @@
-"""create initial schema
-
-Revision ID: 20260315_0001
-Revises:
-Create Date: 2026-03-15 16:30:00
-"""
-
 from typing import Sequence, Union
 
 from alembic import op
@@ -17,16 +10,38 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-user_role = sa.Enum("client", "freelancer", name="user_role")
+user_role = sa.Enum(
+    "client",
+    "freelancer",
+    name="user_role",
+    native_enum=False,
+    create_constraint=True,
+)
 project_status = sa.Enum(
     "open",
     "in_progress",
     "completed",
     "cancelled",
     name="project_status",
+    native_enum=False,
+    create_constraint=True,
 )
-bid_status = sa.Enum("pending", "accepted", "rejected", name="bid_status")
-contract_status = sa.Enum("active", "finished", "cancelled", name="contract_status")
+bid_status = sa.Enum(
+    "pending",
+    "accepted",
+    "rejected",
+    name="bid_status",
+    native_enum=False,
+    create_constraint=True,
+)
+contract_status = sa.Enum(
+    "active",
+    "finished",
+    "cancelled",
+    name="contract_status",
+    native_enum=False,
+    create_constraint=True,
+)
 
 
 def upgrade() -> None:

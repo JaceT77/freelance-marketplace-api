@@ -1,23 +1,18 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
-    Enum,
     Float,
     ForeignKey,
     Integer,
-    String,
     Text,
     UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import BidStatus
-
-
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+from app.models.enums import BidStatus, values_enum
+from app.models.timestamps import utcnow
 
 
 class Bid(Base):
@@ -37,7 +32,7 @@ class Bid(Base):
         nullable=False,
     )
     status: Mapped[BidStatus] = mapped_column(
-        Enum(BidStatus, name="bid_status"),
+        values_enum(BidStatus, name="bid_status"),
         default=BidStatus.PENDING,
         nullable=False,
     )

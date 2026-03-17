@@ -1,14 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, Integer, String, Text
+from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import UserRole
-
-
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+from app.models.enums import UserRole, values_enum
+from app.models.timestamps import utcnow
 
 
 class User(Base):
@@ -18,7 +15,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"))
+    role: Mapped[UserRole] = mapped_column(values_enum(UserRole, name="user_role"))
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

@@ -1,14 +1,11 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.enums import ProjectStatus
-
-
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+from app.models.enums import ProjectStatus, values_enum
+from app.models.timestamps import utcnow
 
 
 class Project(Base):
@@ -20,7 +17,7 @@ class Project(Base):
     budget: Mapped[float] = mapped_column(Float)
     deadline: Mapped[date] = mapped_column(Date)
     status: Mapped[ProjectStatus] = mapped_column(
-        Enum(ProjectStatus, name="project_status"),
+        values_enum(ProjectStatus, name="project_status"),
         default=ProjectStatus.OPEN,
         nullable=False,
     )

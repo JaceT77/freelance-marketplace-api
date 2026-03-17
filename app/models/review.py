@@ -1,13 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-
-
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+from app.models.timestamps import utcnow
 
 
 class Review(Base):

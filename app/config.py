@@ -10,15 +10,13 @@ from sqlalchemy.engine import URL, make_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-DEFAULT_DATABASE_DRIVER = "postgresql+asyncpg"
-DEFAULT_DATABASE_NAME = "freelance_marketplace"
-DEFAULT_TEST_DATABASE_NAME = "freelance_marketplace_test"
+DEFAULT_DATABASE_DRIVER = "sqlite+aiosqlite"
+DEFAULT_DATABASE_NAME = "freelance_marketplace.db"
+DEFAULT_TEST_DATABASE_NAME = "freelance_marketplace_test.db"
 
 
-def _get_optional_env(name: str, fallback_name: str | None = None) -> str | None:
+def _get_optional_env(name: str) -> str | None:
     value = os.getenv(name)
-    if value is None and fallback_name is not None:
-        value = os.getenv(fallback_name)
     if value is None:
         return None
 
@@ -26,27 +24,27 @@ def _get_optional_env(name: str, fallback_name: str | None = None) -> str | None
     return value or None
 
 
-def _get_optional_port(name: str, fallback_name: str | None = None) -> int | None:
-    value = _get_optional_env(name, fallback_name)
-    return int(value) if value else None
+def _resolve_database_path(path_value: str) -> str:
+    database_path = Path(path_value).expanduser()
+    if not database_path.is_absolute():
+        database_path = BASE_DIR / database_path
+    return str(database_path)
 
 
 def normalize_database_url(database_url: str) -> str:
     url = make_url(database_url)
-    if not url.drivername.startswith("postgresql"):
-        raise ValueError("Only PostgreSQL database URLs are supported.")
+    if not url.drivername.startswith("sqlite"):
+        raise ValueError("Only SQLite database URLs are supported.")
     if url.drivername != DEFAULT_DATABASE_DRIVER:
         url = url.set(drivername=DEFAULT_DATABASE_DRIVER)
+    if url.database and url.database != ":memory:":
+        url = url.set(database=_resolve_database_path(url.database))
     return url.render_as_string(hide_password=False)
 
 
 def build_database_url(
     *,
     database_name: str,
-    host: str | None = None,
-    port: int | None = None,
-    username: str | None = None,
-    password: str | None = None,
     database_url: str | None = None,
 ) -> str:
     if database_url:
@@ -54,21 +52,13 @@ def build_database_url(
 
     return URL.create(
         drivername=DEFAULT_DATABASE_DRIVER,
-        username=username,
-        password=password if username else None,
-        host=host,
-        port=port if host else None,
-        database=database_name,
+        database=_resolve_database_path(database_name),
     ).render_as_string(hide_password=False)
 
 
 def get_database_url_from_env() -> str:
     return build_database_url(
         database_name=os.getenv("DATABASE_NAME", DEFAULT_DATABASE_NAME),
-        host=_get_optional_env("DATABASE_HOST"),
-        port=_get_optional_port("DATABASE_PORT"),
-        username=_get_optional_env("DATABASE_USER"),
-        password=_get_optional_env("DATABASE_PASSWORD"),
         database_url=_get_optional_env("DATABASE_URL"),
     )
 
@@ -76,10 +66,6 @@ def get_database_url_from_env() -> str:
 def get_test_database_url_from_env() -> str:
     return build_database_url(
         database_name=os.getenv("TEST_DATABASE_NAME", DEFAULT_TEST_DATABASE_NAME),
-        host=_get_optional_env("TEST_DATABASE_HOST", "DATABASE_HOST"),
-        port=_get_optional_port("TEST_DATABASE_PORT", "DATABASE_PORT"),
-        username=_get_optional_env("TEST_DATABASE_USER", "DATABASE_USER"),
-        password=_get_optional_env("TEST_DATABASE_PASSWORD", "DATABASE_PASSWORD"),
         database_url=_get_optional_env("TEST_DATABASE_URL"),
     )
 
